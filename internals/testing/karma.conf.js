@@ -9,7 +9,7 @@ module.exports = (config) => {
     browsers: process.env.TRAVIS // eslint-disable-line no-nested-ternary
       ? ['ChromeTravis']
       : process.env.APPVEYOR
-        ? ['IE'] : ['Chrome'],
+        ? ['IE'] : ['Safari'],
 
     autoWatch: false,
     singleRun: true,
