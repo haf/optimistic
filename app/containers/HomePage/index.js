@@ -12,14 +12,25 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
+import {Button,Input} from '../../components';
 
 export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     return (
-      <h1>
-        <FormattedMessage {...messages.header} />
-      </h1>
+      <div>
+        <h1>
+          <FormattedMessage {...messages.header} />
+          <span>by Henrik Feldt</span>
+        </h1>
+        <form className="form-group">
+          <Input placeholder="YOUR NAME" />
+          <Input placeholder="YOUR E-MAIL" type="email" />
+          <Button>
+            Chat!
+          </Button>
+        </form>
+      </div>
     );
   }
 }

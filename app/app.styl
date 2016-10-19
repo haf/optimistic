@@ -1,5 +1,10 @@
 whiteText = #EBEBEB
-
+boxBg = rgba(0, 0, 0, 0.50)
+boxFaintBg = rgba(0, 0, 0, 0.13)
+highlightBg = rgba(255, 255, 255, 0.6)
+blackText = #0D0D0D
+greyBorder = #95989A
+interactivePadding = 0.7em
 
 *
   margin: 0; padding: 0
@@ -8,12 +13,41 @@ html
   height 100%
 
 body
-  display flex
-  flex-direction column
-  justify-content center
   background url('images/background.jpg') 70% 40%
   color whiteText
 
 #app
-  flex-grow 1
-  outline 1px solid blue
+  display flex
+  flex-direction column
+  justify-content center
+  padding 2em
+
+  > div
+    flex-grow 1
+    background boxFaintBg
+    text-align center
+    padding 1em
+    
+  h1
+    font-size 140%
+    span:nth-child(2)
+      display block
+      font-size 20%
+
+  input
+  .chat-button
+  .chat-input
+    font-size 90%
+    padding-top interactivePadding
+    padding-bottom interactivePadding
+    margin 0.4em 0
+
+  .chat-button
+    background highlightBg
+    color blackText
+    border 1px solid black
+
+  .chat-input
+    background boxBg
+    color whiteText
+    border 1px solid greyBorder

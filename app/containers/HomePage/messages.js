@@ -8,6 +8,6 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     id: 'app.components.HomePage.header',
-    defaultMessage: 'Optimistic chat!',
+    defaultMessage: 'Functionally Opportunistic',
   },
 });

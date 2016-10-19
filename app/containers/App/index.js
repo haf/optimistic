@@ -12,7 +12,6 @@
  */
 
 import React from 'react';
-
 import './styles.styl';
 
 export default class App extends React.Component { // eslint-disable-line react/prefer-stateless-function
