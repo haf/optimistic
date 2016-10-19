@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 /**
  * Direct selector to the threadPage state domain
  */
-const selectThreadPageDomain = () => (state) => state.get('threadPage');
+const selectThreadPage = () => (state) => state.get('threadPage');
 
 /**
  * Other specific selectors
@@ -14,12 +14,13 @@ const selectThreadPageDomain = () => (state) => state.get('threadPage');
  * Default selector used by ThreadPage
  */
 
-const selectThreadPage = () => createSelector(
-  selectThreadPageDomain(),
-  (substate) => substate.toJS()
+const selectChatMessage = () => createSelector(
+  selectThreadPage(),
+  (pageState) => pageState.get('chatMessage') //pageState.toJS()
 );
 
 export default selectThreadPage;
 export {
-  selectThreadPageDomain,
+  selectThreadPage,
+  selectChatMessage
 };

@@ -32,7 +32,7 @@ body
     font-size 140%
     span:nth-child(2)
       display block
-      font-size 20%
+      font-size 90%
 
   input
   .chat-button
@@ -51,3 +51,9 @@ body
     background boxBg
     color whiteText
     border 1px solid greyBorder
+    box-shadow none
+
+  input:invalid
+  .chat-input input:invalid
+    box-shadow 0 0 3px red
+
