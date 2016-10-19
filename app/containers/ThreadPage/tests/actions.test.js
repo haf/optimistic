@@ -1,18 +1,28 @@
 import expect from 'expect';
 import {
-  defaultAction,
+  sendMessage,
+  changeMessage
 } from '../actions';
 import {
-  DEFAULT_ACTION,
+  SEND_MESSAGE,
+  CHANGE_MESSAGE
 } from '../constants';
 
 describe('ThreadPage actions', () => {
-  describe('Default Action', () => {
-    it('has a type of DEFAULT_ACTION', () => {
-      const expected = {
-        type: DEFAULT_ACTION,
-      };
-      expect(defaultAction()).toEqual(expected);
+  describe('send message', () => {
+    it('sets "message" property', () => {
+      expect(sendMessage('Hello world!')).toEqual({
+        type: SEND_MESSAGE,
+        message: 'Hello world!'
+      });
+    });
+  });
+  describe('change message', () => {
+    it('sets "message" property', () => {
+      expect(changeMessage('Hello world')).toEqual({
+        type: CHANGE_MESSAGE,
+        message: 'Hello world'
+      });
     });
   });
 });

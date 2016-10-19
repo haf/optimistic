@@ -6,14 +6,15 @@
 
 import { fromJS } from 'immutable';
 import {
-  DEFAULT_ACTION,
+  SEND_MESSAGE,
+  CHANGE_MESSAGE
 } from './constants';
 
 const initialState = fromJS({});
 
 function threadPageReducer(state = initialState, action) {
   switch (action.type) {
-    case DEFAULT_ACTION:
+    case SEND_MESSAGE:
       return state;
     default:
       return state;

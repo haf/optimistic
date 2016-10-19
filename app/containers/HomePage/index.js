@@ -9,7 +9,7 @@
  * the linting exception.
  */
 
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 import { createStructuredSelector } from 'reselect';
@@ -19,6 +19,8 @@ import { push } from 'react-router-redux';
 
 import {Button,Input} from 'components';
 import {changeEmail, changeName} from './actions';
+
+import './styles.styl';
 
 export class HomePage extends Component { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -30,30 +32,32 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
       onChangeEmail
     } = this.props;
     return (
-      <div>
-        <h1>
-          <FormattedMessage {...messages.header} />
-          <span>by Henrik Feldt</span>
-        </h1>
-        <form className="form-group" onSubmit={onSubmitForm}>
-          <Input placeholder="YOUR NAME" required="required" onChange={onChangeName} value={name} />
-          <Input placeholder="YOUR E-MAIL" type="email" required="required" onChange={onChangeEmail} value={email} />
-          <Button>
-            Chat!
-          </Button>
-        </form>
+      <div className="page">
+        <div className="page-contents">
+          <h1>
+            <FormattedMessage {...messages.header} />
+            <span>by Henrik Feldt</span>
+          </h1>
+          <form className="form-group" onSubmit={onSubmitForm}>
+            <Input placeholder="YOUR NAME" required="required" onChange={onChangeName} value={name} />
+            <Input placeholder="YOUR E-MAIL" type="email" required="required" onChange={onChangeEmail} value={email} />
+            <Button>
+              Chat!
+            </Button>
+          </form>
+        </div>
       </div>
     );
   }
 }
 
 HomePage.propTypes = {
-  changeRoute: React.PropTypes.func,
-  onSubmitForm: React.PropTypes.func,
-  name: React.PropTypes.string,
-  onChangeName: React.PropTypes.func,
-  email: React.PropTypes.string,
-  onChangeEmail: React.PropTypes.func,
+  changeRoute: PropTypes.func,
+  onSubmitForm: PropTypes.func,
+  name: PropTypes.string,
+  onChangeName: PropTypes.func,
+  email: PropTypes.string,
+  onChangeEmail: PropTypes.func,
 };
 
 export function mapDispatchToProps(dispatch) {
@@ -69,7 +73,6 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = createStructuredSelector({
-});
+const mapStateToProps = createStructuredSelector({});
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

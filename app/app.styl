@@ -10,6 +10,9 @@ interactivePadding = 0.7em
   margin: 0; padding: 0
 
 html
+body
+#app
+#app > div
   height 100%
 
 body
@@ -17,17 +20,20 @@ body
   color whiteText
 
 #app
-  display flex
-  flex-direction column
-  justify-content center
-  padding 2em
+  
+  .page
+    display flex
+    flex-direction column
+    align-items stretch
+    flex-wrap nowrap
+    height 100%
 
-  > div
-    flex-grow 1
-    background boxFaintBg
-    text-align center
-    padding 1em
-    
+    .page-contents
+      margin 2em
+      background boxFaintBg
+      text-align center
+      padding 1em
+
   h1
     font-size 140%
     span:nth-child(2)

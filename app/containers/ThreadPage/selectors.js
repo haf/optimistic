@@ -1,9 +1,13 @@
-import { createSelector } from 'reselect';
+import {
+  createSelector,
+  createStructuredSelector // I have no idea what I'm doing here
+} from 'reselect';
 
 /**
  * Direct selector to the threadPage state domain
  */
-const selectThreadPage = () => (state) => state.get('threadPage');
+//const selectThreadPage = () => (state) => state.get('thread');
+const selectThreadPage = createStructuredSelector({});
 
 /**
  * Other specific selectors
@@ -19,7 +23,6 @@ const selectChatMessage = () => createSelector(
   (pageState) => pageState.get('chatMessage') //pageState.toJS()
 );
 
-export default selectThreadPage;
 export {
   selectThreadPage,
   selectChatMessage
