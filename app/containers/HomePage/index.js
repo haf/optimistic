@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
 import {Button,Input} from 'components';
+import {changeEmail, changeName} from './actions';
 
 export class HomePage extends Component { // eslint-disable-line react/prefer-stateless-function
   render() {
