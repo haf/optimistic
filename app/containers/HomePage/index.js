@@ -9,23 +9,34 @@
  * the linting exception.
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
-import {Button,Input} from '../../components';
+import { createStructuredSelector } from 'reselect';
 
-export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 
+import {Button,Input} from 'components';
+
+export class HomePage extends Component { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const {
+      onSubmitForm,
+      name,
+      onChangeName,
+      email,
+      onChangeEmail
+    } = this.props;
     return (
       <div>
         <h1>
           <FormattedMessage {...messages.header} />
           <span>by Henrik Feldt</span>
         </h1>
-        <form className="form-group">
-          <Input placeholder="YOUR NAME" />
-          <Input placeholder="YOUR E-MAIL" type="email" />
+        <form className="form-group" onSubmit={onSubmitForm}>
+          <Input placeholder="YOUR NAME" required="required" onChange={onChangeName} value={name} />
+          <Input placeholder="YOUR E-MAIL" type="email" required="required" onChange={onChangeEmail} value={email} />
           <Button>
             Chat!
           </Button>
@@ -34,3 +45,30 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     );
   }
 }
+
+HomePage.propTypes = {
+  changeRoute: React.PropTypes.func,
+  onSubmitForm: React.PropTypes.func,
+  name: React.PropTypes.string,
+  onChangeName: React.PropTypes.func,
+  email: React.PropTypes.string,
+  onChangeEmail: React.PropTypes.func,
+};
+
+export function mapDispatchToProps(dispatch) {
+  return {
+    onChangeName: evt => dispatch(changeName(evt.target.value)),
+    onChangeEmail: evt => dispatch(changeEmail(evt.target.value)),
+    onSubmitForm: evt => {
+      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+      dispatch(push('/chat'));
+    },
+
+    dispatch,
+  };
+}
+
+const mapStateToProps = createStructuredSelector({
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
