@@ -21,7 +21,7 @@ module.exports = (options) => ({
       // Transform our own .css files with stylus (removed PostCSS)
       test: /\.(styl|css)$/,
       exclude: /node_modules/,
-      loader: "style-loader!css-loader!stylus-loader",
+      loader: 'style-loader!css-loader!stylus-loader',
     }, {
       // Do not transform vendor's CSS with CSS-modules
       // The point is that they remain in global scope.
@@ -38,7 +38,7 @@ module.exports = (options) => ({
       test: /\.(jpg|png|gif)$/,
       loaders: [
         'file-loader'
-      ],
+      ]
     }, {
       test: /\.html$/,
       loader: 'html-loader',
@@ -65,15 +65,6 @@ module.exports = (options) => ({
       },
     }),
   ]),
-  postcss: () => [
-    postcssFocus(), // Add a :focus to every :hover
-    cssnext({ // Allow future CSS features to be used, also auto-prefixes the CSS...
-      browsers: ['last 2 versions', 'IE > 10'], // ...based on this browser list
-    }),
-    postcssReporter({ // Posts messages from plugins to the terminal
-      clearMessages: true,
-    }),
-  ],
   resolve: {
     modules: ['app', 'node_modules'],
     extensions: [
