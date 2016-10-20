@@ -1,4 +1,4 @@
-import Rx, { Observable } from 'rx-lite';
+import Rx, { Observable, Observer } from 'rx-lite';
 const indexedDB : IDBFactory =
   window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 const IDBTransaction =
@@ -16,21 +16,25 @@ if (!indexedDB) {
 /**
  * Create a schema from the given parameters.
  */
-export function createSchema(db : IDBDatabase, objectStore : string, opts, indicies : Array) {
+export function createSchema(db : IDBDatabase, objectStore : string, opts : Object, indicies : Array) {
   const store = db.createObjectStore(objectStore, opts || {keyPath: "id"});
   indicies.forEach(current => {
+    //console.log('creating index', current.name, current.fields, current.opts);
     store.createIndex(current.name, current.fields, current.opts || {});
   });
 }
 
+export const CommandIndexName = "id_IX";
+
 // internal function to handle the callbacks from the annoying
 // requests, do not publish this function publically.
-function toObservableFromCallback(o, req) {
+function toObservableFromCallback(o : Observer, req : IDBRequest) {
   req.onsuccess = function(evt) { // eslint-disable-line no-param-reassign
-    o.onNext(evt.target.result);
+    o.onNext(req.result);
     o.onCompleted();
   };
   req.onError = function(evt) { // eslint-disable-line no-param-reassign
+    console.error('Error in toObservableFromCallback (lower level code)', evt);
     o.onError(evt);
   };
 }
@@ -86,13 +90,13 @@ export function createDatabase(dbName : string, schemaVersion : Number, onUpgrad
     const req = indexedDB.open(dbName, schemaVersion);
     // will happen before onsuccess unless the schema exist
     req.onupgradeneeded = function(evt) {
-      console.debug('onupgradeneeded', evt);
+      //console.debug('onupgradeneeded', evt);
       // OnUpgradeNeeded.IndexedDbRequest.Instance
       onUpgradeNeeded(evt.target.result);
     };
     req.onsuccess = function(evt) {
       // pass the db instance
-      console.debug('Instantiated database', evt.target.result);
+      //console.debug('Instantiated database', evt.target.result);
       o.onNext(evt.target.result);
       o.onCompleted();
     };
@@ -110,6 +114,57 @@ export function createDatabase(dbName : string, schemaVersion : Number, onUpgrad
 export function persistMiddlewareFactory(objectStore : string, schemaVersion : Number, onUpgradeNeeded) {
   return createDatabase(objectStore, schemaVersion, onUpgradeNeeded)
     .map(db => persistMiddleware(db, objectStore));
+}
+
+/**
+ * Creates a schema that's specific to this middleware implementation.
+ */
+export function createMiddlewareSchema(db : IDBDatabase, objectStore : string) {
+  return createSchema(db, objectStore, {
+    autoIncrement: true
+  }, [{ // indicies
+    name: CommandIndexName,
+    fields: 'headers.id',
+    opts: { unique: true } 
+  }]);
+}
+
+// helper functions for dealing with deleting by command id (see deleteCommand below)
+function getPKFromCommandId(index, cid) {
+  if (typeof cid === 'undefined') throw new Error('Cannot delete by undefined command id (cid).');
+  return Observable.create(o => {
+    const req = index.getKey(cid);
+    req.onsuccess = function() {
+      // WTF!
+      o.onNext(req.result);
+      o.onCompleted();
+    };
+    req.onerror = function(evt) {
+      o.onError(evt);
+    };
+  });
+}
+
+function deleteByPK(os, pk) {
+  if (typeof pk === 'undefined') throw new Error('Cannot delete by undefined PK.');
+  return Observable.create(o => {
+    //console.debug('deleteByPK', pk);
+    const rows = os.delete(pk);
+    toObservableFromCallback(o, rows);
+  });
+}
+
+/**
+ * Tries to delete the command by its id from the underlying
+ * IndexedDB instance.
+ */
+export function deleteCommand(db : IDBDatabase, objectStore : string, command : Object) : Observable {
+  if (typeof command === 'undefined' || command === null) throw new Error('Cannot delete an undefined or null command');
+  const tx = db.transaction(objectStore, 'readwrite');
+  const os = tx.objectStore(objectStore);
+  const byIdIndex = os.index(CommandIndexName);
+  return getPKFromCommandId(byIdIndex, command.headers.id)
+    .concatMap(pk => deleteByPK(os, pk));
 }
 
 // Communicator related code
@@ -135,8 +190,4 @@ export function getUnsent(db : IDBDatabase, objectStore : string) : Observable {
       o.onError(event);
     };
   });
-}
-
-
-export function sendCommand() {
 }

@@ -6,16 +6,20 @@ const expect = chai.expect;
 
 import {
   createSchema,
+  createMiddlewareSchema,
   createDatabase,
   persistMiddleware,
   getById,
-  getUnsent
+  getUnsent,
+  saveCommand,
+  deleteCommand
 } from './persistMiddleware';
 import { fromJS } from 'immutable';
 import {
   createStore,
   applyMiddleware
 } from 'redux';
+import {Observable} from 'rx-lite';
 
 // (store) state
 const initialState = {};
@@ -50,26 +54,27 @@ const sampleReducer = (state = initialState, action) => {
   } 
 };
 
+function genId() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random()*16|0,
+          v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+
 describe('persist middleware', () => {
-  const databaseName =
-    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = Math.random()*16|0,
-            v = c == 'x' ? r : (r&0x3|0x8);
-      return v.toString(16);
-    });
-  var dbP, store;
+  var dbP, store, databaseName;
   function createSubjectStore(mid) { // takes the middleware
     const store = createStore(sampleReducer, initialState, applyMiddleware(mid));
     return store;
   }
 
   beforeEach(() => {
-    dbP = createDatabase(databaseName, 7, db => {
-      //db.deleteObjectStore(databaseName);
-      createSchema(db, databaseName, { autoIncrement: true }, [
-        { name: 'id_IX', fields: ['headers.id'], opts: { unique: true } }
-      ]);
-    }).toPromise();
+    databaseName = genId();
+
+    dbP = createDatabase(databaseName, 7, db =>
+      createMiddlewareSchema(db, databaseName)
+    ).toPromise();
 
     store = dbP.
       then(db => persistMiddleware(db, databaseName)).
@@ -118,13 +123,31 @@ describe('persist middleware', () => {
         concatMap(_ => getUnsent(db, databaseName).toArray()).
         toPromise()
     })).to.eventually.be.fulfilled.then(unsent => {
-      expect(unsent.length).to.be.greaterThan(1);
+      expect(unsent.length).to.be.greaterThan(0);
     });
   });
-});
 
-describe('smoke', () => {
-  it('is pluffy', () => {
-    expect(true).to.equal(true);
+  it('sent command can be deleted', () => {
+    const cmd = sendMessage("Hi Yaks", "mycmdid", "mythreadid");
+    const obs =
+      Observable.fromPromise(dbP)
+      .concatMap(db =>
+        saveCommand(db, databaseName, cmd)
+          .map(x => [x, db])
+      )
+      .concatMap(([id, db]) => {
+        expect(id).not.to.be.undefined;
+        expect(id).to.be.a('Number');
+        return deleteCommand(db, databaseName, cmd)
+          .map([id, db]);
+      })
+      .concatMap(([id, db]) =>
+         getById(db, databaseName, id)
+      )
+      .tap(found => {
+        expect(found).to.be.undefined;
+      })
+      .toPromise();
+    return expect(obs).to.eventually.be.fulfilled;
   });
 });
