@@ -242,6 +242,13 @@ export function periodicSender(createRequest, db, objectStore) {
   return periodicRequest(connectivityState(), () =>
     getUnsent(db, objectStore)
       .tap(cmd => console.debug('creating request from command', cmd))
-      .map(createRequest),
+      .concatMap(cmd =>
+        // progress can be passed into create request, as an Observer instance
+        createRequest(cmd)
+          .map(cmd)
+      )
+      .concatMap(cmd =>
+        deleteCommand(db, objectStore, cmd)
+      ),
   500);
 }
