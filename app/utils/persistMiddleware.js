@@ -1,4 +1,4 @@
-import Rx, { Observable, Observer } from 'rx-lite';
+import Rx, { Observable, Observer, Scheduler } from 'rx-lite';
 const indexedDB : IDBFactory =
   window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 const IDBTransaction =
@@ -190,4 +190,58 @@ export function getUnsent(db : IDBDatabase, objectStore : string) : Observable {
       o.onError(event);
     };
   });
+}
+
+/**
+ * Gives you back a connectivity observable.
+ */
+export function connectivityState() {
+  const initial = window.navigator.onLine;
+  return Observable.create(o => {
+    o.onNext(initial);
+
+    const handle = evt => o.onNext(navigator.onLine);
+    window.addEventListener('online', handle);
+    window.addEventListener('offline', handle);
+  });
+}
+
+/**
+ * Creates an observable that fires in a regular interval, while
+ * the browser is online, as specified by the Observable[boolean]
+ * that is the first parameter. Will call makeRequests and expect it
+ * to return an observable of values back, that are then merged
+ * to produce the result.
+ * 
+ * The observable is cold, so you'll need to subscribe it to
+ * wake its scheduler.
+ */
+export function periodicRequest(connectivityStream, makeRequests, interval = 500) {
+  return Observable.combineLatest([
+    connectivityStream,
+    Observable.interval(interval)
+  ])
+    .filter((online, _) => online)
+    .concatMap((connected, _) =>
+      makeRequests()
+    );
+}
+
+/**
+ * A function that takes a request factory 'createRequest' and
+ * the storage location of the commands to be sent, and then
+ * using the periodicRequest function, loops through the db's
+ * contents and then sends the actual request.
+ * 
+ * The 'createRequest' function should error on faults in sending
+ * over the network.
+ * 
+ * This function's observable should never error.
+ */
+export function periodicSender(createRequest, db, objectStore) {
+  return periodicRequest(connectivityState(), () =>
+    getUnsent(db, objectStore)
+      .tap(cmd => console.debug('creating request from command', cmd))
+      .map(createRequest),
+  500);
 }
