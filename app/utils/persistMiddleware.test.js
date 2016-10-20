@@ -151,3 +151,7 @@ describe('persist middleware', () => {
     return expect(obs).to.eventually.be.fulfilled;
   });
 });
+
+describe('periodicSender + infra', () => {
+  it('should be done later');
+});
