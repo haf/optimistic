@@ -15,13 +15,13 @@ const SEND_MESSAGE = "optimistic/tests/SEND_MESSAGE";
 
 const sendMessage = message => ({
   type: SEND_MESSAGE,
-  message: message
+  message
 });
 
 const sampleReducer = (state = initialState, action) => {
   if (action.type === SEND_MESSAGE) return action.message;
   return state;
-}
+};
 
 describe('doNothingWith', () => {
   it("working reducer", () => {

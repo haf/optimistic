@@ -52,7 +52,6 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
 }
 
 HomePage.propTypes = {
-  changeRoute: PropTypes.func,
   onSubmitForm: PropTypes.func,
   name: PropTypes.string,
   onChangeName: PropTypes.func,

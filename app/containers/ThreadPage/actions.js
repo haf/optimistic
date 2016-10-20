@@ -13,7 +13,7 @@ export function changeMessage(message) {
   return {
     type: CHANGE_MESSAGE,
     message
-  }
+  };
 }
 
 export function sendMessage(message) {

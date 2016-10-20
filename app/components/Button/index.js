@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import './styles.styl';
 
-class Button extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class Button extends Component { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <button {...this.props} className='chat-button'>
@@ -10,5 +10,9 @@ class Button extends React.Component { // eslint-disable-line react/prefer-state
     );
   }
 }
+
+Button.propTypes = {
+  children: PropTypes.array
+};
 
 export default Button;
