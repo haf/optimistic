@@ -1,6 +1,6 @@
 import {
   createSelector,
-  createStructuredSelector // I have no idea what I'm doing here
+  createStructuredSelector
 } from 'reselect';
 
 /**
